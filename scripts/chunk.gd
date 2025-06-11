@@ -1,5 +1,7 @@
 class_name Chunk extends StaticBody3D
 
+signal generated(chunk: Chunk)
+
 # Single block vertices
 const VERTICES = [
 	Vector3i(0, 0, 0),
@@ -26,26 +28,50 @@ const DIMENSIONS = Vector3i(8, 64, 8)
 
 var collision_shape_3d = CollisionShape3D.new()
 var mesh_instance_3d = MeshInstance3D.new()
-var surface_tool: SurfaceTool = SurfaceTool.new()
 var blocks: Array
 var chunk_generator = FlatChunkGenerator.new()
+var _thread: Thread
 
-func _ready() -> void:
-	# Prepare blocks array
-	blocks = []
-	blocks.resize(DIMENSIONS.x)
-	for x in DIMENSIONS.x:
-		blocks[x] = []
-		blocks[x].resize(DIMENSIONS.y)
-		for y in DIMENSIONS.y:
-			blocks[x][y] = []
-			blocks[x][y].resize(DIMENSIONS.z)
-			
-	add_child(collision_shape_3d)
-	add_child(mesh_instance_3d)
-			
-	generate()
-	update()
+func start_generation() -> void:
+        _thread = Thread.new()
+        _thread.start(self, "_generate_thread")
+
+func _generate_thread(userdata) -> void:
+        var local_blocks = []
+        local_blocks.resize(DIMENSIONS.x)
+        for x in DIMENSIONS.x:
+                local_blocks[x] = []
+                local_blocks[x].resize(DIMENSIONS.y)
+                for y in DIMENSIONS.y:
+                        local_blocks[x][y] = []
+                        local_blocks[x][y].resize(DIMENSIONS.z)
+
+        for x in range(DIMENSIONS.x):
+                for y in range(DIMENSIONS.y):
+                        for z in range(DIMENSIONS.z):
+                                local_blocks[x][y][z] = chunk_generator.calc_block(Vector3i(x, y, z))
+
+        var st = SurfaceTool.new()
+        st.begin(Mesh.PRIMITIVE_TRIANGLES)
+        for x in range(DIMENSIONS.x):
+                for y in range(DIMENSIONS.y):
+                        for z in range(DIMENSIONS.z):
+                                if local_blocks[x][y][z] != null:
+                                        _create_block(st, Vector3i(chunk_position.x * DIMENSIONS.x + x, y, chunk_position.y * DIMENSIONS.z + z))
+                                        st.set_material(local_blocks[x][y][z].material)
+        var mesh = st.commit()
+        var shape = mesh.create_trimesh_shape()
+        call_deferred("_generation_completed", local_blocks, mesh, shape)
+
+func _generation_completed(local_blocks: Array, mesh: Mesh, shape: Shape3D) -> void:
+        blocks = local_blocks
+        add_child(collision_shape_3d)
+        add_child(mesh_instance_3d)
+        mesh_instance_3d.mesh = mesh
+        collision_shape_3d.shape = shape
+        if _thread:
+                _thread.wait_to_finish()
+        generated.emit(self)
 
 func generate() -> void:
 	for x in range(DIMENSIONS.x):
@@ -54,26 +80,27 @@ func generate() -> void:
 				blocks[x][y][z] = chunk_generator.calc_block(Vector3i(x, y, z))
 		
 func update() -> void:
-	surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for x in range(DIMENSIONS.x):
-		for y in range(DIMENSIONS.y):
-			for z in range(DIMENSIONS.z):
-				if blocks[x][y][z] != null:
-					create_block(Vector3i(chunk_position.x * DIMENSIONS.x + x, y, chunk_position.y * DIMENSIONS.z + z))
-					surface_tool.set_material(blocks[x][y][z].material)
-	var mesh = surface_tool.commit()
-	mesh_instance_3d.mesh = mesh
-	collision_shape_3d.shape = mesh.create_trimesh_shape()
+        var surface_tool = SurfaceTool.new()
+        surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+        for x in range(DIMENSIONS.x):
+                for y in range(DIMENSIONS.y):
+                        for z in range(DIMENSIONS.z):
+                                if blocks[x][y][z] != null:
+                                       _create_block(surface_tool, Vector3i(chunk_position.x * DIMENSIONS.x + x, y, chunk_position.y * DIMENSIONS.z + z))
+                                        surface_tool.set_material(blocks[x][y][z].material)
+        var mesh = surface_tool.commit()
+        mesh_instance_3d.mesh = mesh
+        collision_shape_3d.shape = mesh.create_trimesh_shape()
 				
-func create_block(block_position: Vector3i) -> void:
-	create_face(TOP_FACE, block_position)
-	create_face(BOTTOM_FACE, block_position)
-	create_face(LEFT_FACE, block_position)
-	create_face(RIGHT_FACE, block_position)
-	create_face(FRONT_FACE, block_position)
-	create_face(BACK_FACE, block_position)
+func _create_block(surface_tool: SurfaceTool, block_position: Vector3i) -> void:
+        _create_face(surface_tool, TOP_FACE, block_position)
+        _create_face(surface_tool, BOTTOM_FACE, block_position)
+        _create_face(surface_tool, LEFT_FACE, block_position)
+        _create_face(surface_tool, RIGHT_FACE, block_position)
+        _create_face(surface_tool, FRONT_FACE, block_position)
+        _create_face(surface_tool, BACK_FACE, block_position)
 				
-func create_face(face: Array, block_position: Vector3i) -> void:
+func _create_face(surface_tool: SurfaceTool, face: Array, block_position: Vector3i) -> void:
 	var a: Vector3 = VERTICES[face[0]] + block_position
 	var b: Vector3 = VERTICES[face[1]] + block_position
 	var c: Vector3 = VERTICES[face[2]] + block_position
