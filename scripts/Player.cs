@@ -7,14 +7,14 @@ public partial class Player : CharacterBody3D
 
     private float lookSensetivity = 0.002f;
 
-    [NodePath("Camera3D")]
     private Camera3D camera3D;
 
-    [NodePath("Camera3D/RayCast3D")]
     private RayCast3D rayCast3D;
 
     public override void _Ready()
     {
+        camera3D = GetNode<Camera3D>("Camera3D");
+        rayCast3D = GetNode<RayCast3D>("Camera3D/RayCast3D");
         Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 
