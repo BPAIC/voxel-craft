@@ -5,37 +5,37 @@
 [ext_resource type="PackedScene" uid="uid://byveqldxgj6e1" path="res://scenes/chunk_manager.tscn" id="3_4wyf3"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_e5uuo"]
-sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
-ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+  sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+  ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
 
 [sub_resource type="Sky" id="Sky_nnsk1"]
-sky_material = SubResource("ProceduralSkyMaterial_e5uuo")
+  sky_material = SubResource("ProceduralSkyMaterial_e5uuo")
 
 [sub_resource type="Environment" id="Environment_rwgxs"]
-background_mode = 2
-sky = SubResource("Sky_nnsk1")
-tonemap_mode = 2
-glow_enabled = true
+  background_mode = 2
+  sky = SubResource("Sky_nnsk1")
+  tonemap_mode = 2
+  glow_enabled = true
 
 [node name="World" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_rwgxs")
+  environment = SubResource("Environment_rwgxs")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
-shadow_enabled = true
+  transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+  shadow_enabled = true
 
 [node name="Player" parent="." instance=ExtResource("1_nnsk1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+  transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
-transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 10, 0, -0.5, 0)
-use_collision = true
+  transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 10, 0, -0.5, 0)
+  use_collision = true
 
 [node name="DebugUI" parent="." instance=ExtResource("2_rwgxs")]
-mouse_filter = 1
+  mouse_filter = 1
 
 [node name="ChunkManager" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_4wyf3")]
-radius = 16
-player = NodePath("../Player")
+  radius = 16
+  player = NodePath("../Player")
