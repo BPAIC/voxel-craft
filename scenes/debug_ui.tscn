@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bq7s6ekucwver"]
 
-[ext_resource type="Script" uid="uid://djhac0it8fevt" path="res://scripts/debug_ui/coords_label.gd" id="1_loc82"]
+[ext_resource type="Script" uid="uid://djhac0it8fevt" path="res://scripts/debug_ui/CoordsLabel.cs" id="1_loc82"]
 
 [node name="DebugUI" type="Control"]
 layout_mode = 3

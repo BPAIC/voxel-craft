@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://byveqldxgj6e1"]
 
-[ext_resource type="Script" uid="uid://dljuc7v1pcsq0" path="res://scripts/chunk_manager.gd" id="1_23q6e"]
+[ext_resource type="Script" uid="uid://dljuc7v1pcsq0" path="res://scripts/ChunkManager.cs" id="1_23q6e"]
 
 [node name="ChunkManager" type="Node3D"]
 script = ExtResource("1_23q6e")
