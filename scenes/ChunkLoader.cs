@@ -3,25 +3,25 @@ using Godot;
 [GlobalClass]
 public partial class ChunkLoader : Resource
 {
-    private Thread thread = new Thread();
+    private Godot.Thread thread = new Godot.Thread();
     private bool isRunning = true;
-    private Semaphore sem = new Semaphore();
+    private Godot.Semaphore sem = new Godot.Semaphore();
 
     private Godot.Collections.Array<Vector2I> chunkPositionsToLoad = new();
-    private Mutex chunkPositionsToLoadMtx = new Mutex();
+    private Godot.Mutex chunkPositionsToLoadMtx = new Godot.Mutex();
 
     private Godot.Collections.Array<Chunk> loadedChunks = new();
-    private Mutex loadedChunksMtx = new Mutex();
+    private Godot.Mutex loadedChunksMtx = new Godot.Mutex();
 
     private Godot.Collections.Array<Vector2I> chunkPositionsToLoadLocal = new();
     private Godot.Collections.Array<Chunk> loadedChunksLocal = new();
 
-    public override void _Init()
+    public ChunkLoader()
     {
         thread.Start(Callable.From(() => Loop()));
     }
 
-    public override void _ExitTree()
+    ~ChunkLoader()
     {
         isRunning = false;
         sem.Post();
