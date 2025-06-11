@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BlockResource" load_steps=3 format=3 uid="uid://hvvmas3gyu67"]
 
 [ext_resource type="Material" uid="uid://cl8c1jo5g4ri1" path="res://assets/materials/planks.tres" id="1_6b0yt"]
-[ext_resource type="Script" uid="uid://ex8d00vqv502" path="res://scripts/block_resource.gd" id="2_3lcpy"]
+[ext_resource type="Script" uid="uid://tvrtwt14jxwt" path="res://scripts/BlockResource.cs" id="2_3lcpy"]
 
 [resource]
 script = ExtResource("2_3lcpy")
@@ -10,4 +10,4 @@ name = "planks"
 material = ExtResource("1_6b0yt")
 is_collidable = true
 is_transparent = false
-metadata/_custom_type_script = "uid://ex8d00vqv502"
+metadata/_custom_type_script = "uid://tvrtwt14jxwt"
