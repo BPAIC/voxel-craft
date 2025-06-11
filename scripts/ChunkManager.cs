@@ -5,8 +5,10 @@ public partial class ChunkManager : Node3D
     [Export]
     public int Radius = 2;
 
-    [Export]
-    public CharacterBody3D Player;
+    [Export(PropertyName = "player")]
+    public NodePath PlayerPath;
+
+    private CharacterBody3D Player;
 
     private Vector2I playerChunkPosition;
     private Godot.Collections.Dictionary<Vector2I, Chunk> loadedChunks = new();
@@ -14,6 +16,11 @@ public partial class ChunkManager : Node3D
 
     public override void _Ready()
     {
+        if (PlayerPath != null && PlayerPath != NodePath.Empty)
+        {
+            Player = GetNode<CharacterBody3D>(PlayerPath);
+        }
+
         playerChunkPosition = GetCurrentPlayerChunkPosition();
 
         for (int x = -Radius; x <= Radius; x++)
@@ -63,6 +70,9 @@ public partial class ChunkManager : Node3D
 
     private Vector2I GetCurrentPlayerChunkPosition()
     {
+        if (Player == null)
+            return Vector2I.Zero;
+
         Vector3 pcp = (Player.Position / 8).Floor();
         return new Vector2I((int)pcp.X, (int)pcp.Z);
     }
