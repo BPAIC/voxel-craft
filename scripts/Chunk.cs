@@ -112,8 +112,20 @@ public partial class Chunk : StaticBody3D
         Vector3 sideB = a - c;
         Vector3 normal = sideA.Cross(sideB);
 
-        surfaceTool.AddTriangleFan(new Godot.Collections.Array<Vector3>{a,b,c}, new Godot.Collections.Array<Vector2>{uvA,uvB,uvC}, null, null, new Godot.Collections.Array<Vector3>{normal});
-        surfaceTool.AddTriangleFan(new Godot.Collections.Array<Vector3>{a,c,d}, new Godot.Collections.Array<Vector2>{uvA,uvC,uvD}, null, null, new Godot.Collections.Array<Vector3>{normal});
+        surfaceTool.AddTriangleFan(
+            new Vector3[] { a, b, c },
+            new Vector2[] { uvA, uvB, uvC },
+            null,
+            null,
+            new Vector3[] { normal }
+        );
+        surfaceTool.AddTriangleFan(
+            new Vector3[] { a, c, d },
+            new Vector2[] { uvA, uvC, uvD },
+            null,
+            null,
+            new Vector3[] { normal }
+        );
     }
 
     public bool IsBlock(Vector3I blockPosition)
