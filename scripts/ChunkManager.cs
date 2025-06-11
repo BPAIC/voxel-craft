@@ -16,7 +16,7 @@ public partial class ChunkManager : Node3D
 
     public override void _Ready()
     {
-        if (PlayerPath != null && PlayerPath != NodePath.Empty)
+        if (PlayerPath != null && !PlayerPath.IsEmpty())
         {
             Player = GetNode<CharacterBody3D>(PlayerPath);
         }
