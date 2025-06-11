@@ -60,8 +60,9 @@ public partial class ChunkLoader : Resource
 
     public bool HasLoadedChunks()
     {
-        bool result = !loadedChunks.IsEmpty();
+        bool result;
         Monitor.Enter(loadedChunksMtx);
+        result = loadedChunks.Count > 0;
         Monitor.Exit(loadedChunksMtx);
         return result;
     }
