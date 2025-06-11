@@ -3,7 +3,7 @@ extends CharacterBody3D
 const SPEED = 5.0 * 3
 const JUMP_VELOCITY = 6.5
 
-var look_sensetivity = 0.002
+var look_sensitivity = 0.002
 
 @onready var camera_3d: Camera3D = $Camera3D
 @onready var ray_cast_3d: RayCast3D = $Camera3D/RayCast3D
@@ -13,8 +13,8 @@ func _ready() -> void:
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		rotation.y = rotation.y - event.relative.x * look_sensetivity
-		camera_3d.rotation.x = camera_3d.rotation.x - event.relative.y * look_sensetivity
+               rotation.y = rotation.y - event.relative.x * look_sensitivity
+               camera_3d.rotation.x = camera_3d.rotation.x - event.relative.y * look_sensitivity
 		camera_3d.rotation.x = clamp(camera_3d.rotation.x, deg_to_rad(-90.0), deg_to_rad(90))
 
 func _physics_process(delta: float) -> void:
