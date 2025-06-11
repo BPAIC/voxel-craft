@@ -1,37 +1,39 @@
 using Godot;
+using System.Threading;
 
 [GlobalClass]
 public partial class ChunkLoader : Resource
 {
-    private Godot.Thread thread = new Godot.Thread();
+    private Thread thread;
     private bool isRunning = true;
-    private Godot.Semaphore sem = new Godot.Semaphore();
+    private AutoResetEvent sem = new AutoResetEvent(false);
 
     private Godot.Collections.Array<Vector2I> chunkPositionsToLoad = new();
-    private Godot.Mutex chunkPositionsToLoadMtx = new Godot.Mutex();
+    private readonly object chunkPositionsToLoadMtx = new object();
 
     private Godot.Collections.Array<Chunk> loadedChunks = new();
-    private Godot.Mutex loadedChunksMtx = new Godot.Mutex();
+    private readonly object loadedChunksMtx = new object();
 
     private Godot.Collections.Array<Vector2I> chunkPositionsToLoadLocal = new();
     private Godot.Collections.Array<Chunk> loadedChunksLocal = new();
 
     public ChunkLoader()
     {
-        thread.Start(Callable.From(() => Loop()));
+        thread = new Thread(Loop);
+        thread.Start();
     }
 
     ~ChunkLoader()
     {
         isRunning = false;
-        sem.Post();
-        thread.WaitToFinish();
+        sem.Set();
+        thread.Join();
     }
 
     public void PushChunkPositionsToLoad(Godot.Collections.Array<Vector2I> newChunkPositionsToLoad)
     {
-        loadedChunksMtx.Lock();
-        chunkPositionsToLoadMtx.Lock();
+        Monitor.Enter(loadedChunksMtx);
+        Monitor.Enter(chunkPositionsToLoadMtx);
 
         foreach (Vector2I pos in chunkPositionsToLoadLocal)
         {
@@ -51,25 +53,25 @@ public partial class ChunkLoader : Resource
 
         chunkPositionsToLoad.AddRange(newChunkPositionsToLoad);
 
-        chunkPositionsToLoadMtx.Unlock();
-        loadedChunksMtx.Unlock();
-        sem.Post();
+        Monitor.Exit(chunkPositionsToLoadMtx);
+        Monitor.Exit(loadedChunksMtx);
+        sem.Set();
     }
 
     public bool HasLoadedChunks()
     {
         bool result = !loadedChunks.IsEmpty();
-        loadedChunksMtx.Lock();
-        loadedChunksMtx.Unlock();
+        Monitor.Enter(loadedChunksMtx);
+        Monitor.Exit(loadedChunksMtx);
         return result;
     }
 
     public Godot.Collections.Array<Chunk> GetLoadedChunks()
     {
-        loadedChunksMtx.Lock();
+        Monitor.Enter(loadedChunksMtx);
         var tmp = loadedChunks.Duplicate();
         loadedChunks.Clear();
-        loadedChunksMtx.Unlock();
+        Monitor.Exit(loadedChunksMtx);
         return tmp;
     }
 
@@ -77,12 +79,12 @@ public partial class ChunkLoader : Resource
     {
         while (isRunning)
         {
-            sem.Wait();
+            sem.WaitOne();
 
-            chunkPositionsToLoadMtx.Lock();
+            Monitor.Enter(chunkPositionsToLoadMtx);
             chunkPositionsToLoadLocal = chunkPositionsToLoad.Duplicate();
             chunkPositionsToLoad.Clear();
-            chunkPositionsToLoadMtx.Unlock();
+            Monitor.Exit(chunkPositionsToLoadMtx);
 
             foreach (Vector2I pos in chunkPositionsToLoadLocal)
             {
@@ -92,9 +94,9 @@ public partial class ChunkLoader : Resource
                 loadedChunksLocal.Add(chunk);
             }
 
-            loadedChunksMtx.Lock();
+            Monitor.Enter(loadedChunksMtx);
             loadedChunks.AddRange(loadedChunksLocal);
-            loadedChunksMtx.Unlock();
+            Monitor.Exit(loadedChunksMtx);
             loadedChunksLocal.Clear();
         }
     }
