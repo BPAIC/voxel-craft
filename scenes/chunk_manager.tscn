@@ -4,3 +4,4 @@
 
 [node name="ChunkManager" type="Node3D"]
 script = ExtResource("1_23q6e")
+radius = 8

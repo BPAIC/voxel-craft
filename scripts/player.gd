@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-const SPEED = 5.0 * 3
+const SPEED = 5.0 * 5
 const JUMP_VELOCITY = 6.5
 
 var look_sensitivity = 0.002
