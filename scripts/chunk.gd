@@ -4,14 +4,14 @@ signal generated(chunk: Chunk)
 
 # Single block vertices
 const VERTICES = [
-	Vector3i(0, 0, 0),
-	Vector3i(1, 0, 0),
-	Vector3i(0, 1, 0),
-	Vector3i(1, 1, 0),
-	Vector3i(0, 0, 1),
-	Vector3i(1, 0, 1),
-	Vector3i(0, 1, 1),
-	Vector3i(1, 1, 1),
+        Vector3i(0, 0, 0),
+        Vector3i(1, 0, 0),
+        Vector3i(0, 1, 0),
+        Vector3i(1, 1, 0),
+        Vector3i(0, 0, 1),
+        Vector3i(1, 0, 1),
+        Vector3i(0, 1, 1),
+        Vector3i(1, 1, 1),
 ]
 
 # Faces vertices painting order
@@ -74,11 +74,12 @@ func _generation_completed(local_blocks: Array, mesh: Mesh, shape: Shape3D) -> v
         generated.emit(self)
 
 func generate() -> void:
-	for x in range(DIMENSIONS.x):
-		for y in range(DIMENSIONS.y):
-			for z in range(DIMENSIONS.z):
-				blocks[x][y][z] = chunk_generator.calc_block(Vector3i(x, y, z))
-		
+
+        for x in range(DIMENSIONS.x):
+                for y in range(DIMENSIONS.y):
+                        for z in range(DIMENSIONS.z):
+                                blocks[x][y][z] = chunk_generator.calc_block(Vector3i(x, y, z))
+
 func update() -> void:
         var surface_tool = SurfaceTool.new()
         surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -86,12 +87,12 @@ func update() -> void:
                 for y in range(DIMENSIONS.y):
                         for z in range(DIMENSIONS.z):
                                 if blocks[x][y][z] != null:
-                                       _create_block(surface_tool, Vector3i(chunk_position.x * DIMENSIONS.x + x, y, chunk_position.y * DIMENSIONS.z + z))
+                                        _create_block(surface_tool, Vector3i(chunk_position.x * DIMENSIONS.x + x, y, chunk_position.y * DIMENSIONS.z + z))
                                         surface_tool.set_material(blocks[x][y][z].material)
         var mesh = surface_tool.commit()
         mesh_instance_3d.mesh = mesh
         collision_shape_3d.shape = mesh.create_trimesh_shape()
-				
+
 func _create_block(surface_tool: SurfaceTool, block_position: Vector3i) -> void:
         _create_face(surface_tool, TOP_FACE, block_position)
         _create_face(surface_tool, BOTTOM_FACE, block_position)
@@ -99,27 +100,27 @@ func _create_block(surface_tool: SurfaceTool, block_position: Vector3i) -> void:
         _create_face(surface_tool, RIGHT_FACE, block_position)
         _create_face(surface_tool, FRONT_FACE, block_position)
         _create_face(surface_tool, BACK_FACE, block_position)
-				
+
 func _create_face(surface_tool: SurfaceTool, face: Array, block_position: Vector3i) -> void:
-	var a: Vector3 = VERTICES[face[0]] + block_position
-	var b: Vector3 = VERTICES[face[1]] + block_position
-	var c: Vector3 = VERTICES[face[2]] + block_position
-	var d: Vector3 = VERTICES[face[3]] + block_position
-	
-	var uv_a = Vector2(0, 0)
-	var uv_b = Vector2(0, 1.0)
-	var uv_c = Vector2(1.0, 1.0)
-	var uv_d = Vector2(1.0, 0)
-	
-	# Calculate normals
-	var side_a = b - a
-	var side_b = a - c
-	var normal = side_a.cross(side_b)
-	
-	surface_tool.add_triangle_fan([a, b, c], [uv_a, uv_b, uv_c], [], [], [normal])
-	surface_tool.add_triangle_fan([a, c, d], [uv_a, uv_c, uv_d], [], [], [normal])
+        var a: Vector3 = VERTICES[face[0]] + block_position
+        var b: Vector3 = VERTICES[face[1]] + block_position
+        var c: Vector3 = VERTICES[face[2]] + block_position
+        var d: Vector3 = VERTICES[face[3]] + block_position
+
+        var uv_a = Vector2(0, 0)
+        var uv_b = Vector2(0, 1.0)
+        var uv_c = Vector2(1.0, 1.0)
+        var uv_d = Vector2(1.0, 0)
+
+        # Calculate normals
+        var side_a = b - a
+        var side_b = a - c
+        var normal = side_a.cross(side_b)
+
+        surface_tool.add_triangle_fan([a, b, c], [uv_a, uv_b, uv_c], [], [], [normal])
+        surface_tool.add_triangle_fan([a, c, d], [uv_a, uv_c, uv_d], [], [], [normal])
 
 func is_block(block_position: Vector3i) -> bool:
-	if blocks[block_position.x][block_position.y][block_position.z]:
-		return true
-	return false
+        if blocks[block_position.x][block_position.y][block_position.z]:
+                return true
+        return false
