@@ -5,7 +5,7 @@ public partial class ChunkManager : Node3D
     [Export]
     public int Radius = 2;
 
-    [Export(PropertyName = "player")]
+    [Export]
     public NodePath PlayerPath;
 
     private CharacterBody3D Player;
